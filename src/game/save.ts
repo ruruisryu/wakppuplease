@@ -1,4 +1,5 @@
 import { fresh, type State } from './simulation.ts';
+import { validWorkbench } from './wax-state.ts';
 export const KEY = 'wakppu.please.v1';
 export function validate(v: unknown): v is State {
   if (!v || typeof v !== 'object') return false;
@@ -6,7 +7,7 @@ export function validate(v: unknown): v is State {
   const n = (x: unknown, max: number) =>
     typeof x === 'number' && Number.isFinite(x) && x >= 0 && x <= max;
   return (
-    s.version === 1 &&
+    s.version === 2 &&
     n(s.coins, 1e8) &&
     n(s.sold, 1e7) &&
     n(s.made, 1e7) &&
@@ -14,8 +15,8 @@ export function validate(v: unknown): v is State {
     n(s.shelf, 6) &&
     n(s.carried, 3) &&
     n(s.batch, 1e8) &&
-    s.wax?.length === 80 &&
-    s.wax.every((x) => n(x, 1)) &&
+    n(s.waxWork, 1) &&
+    (s.workbench === null || validWorkbench(s.workbench)) &&
     !!s.player &&
     Number.isFinite(s.player.x) &&
     Math.abs(s.player.x) < 7 &&
@@ -42,12 +43,23 @@ export function load() {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { state: fresh(), recovered: false };
-    const s = JSON.parse(raw);
+    let s = JSON.parse(raw);
+    let migrated = false;
+    if (
+      s?.version === 1 &&
+      Array.isArray(s.wax) &&
+      s.wax.length === 80 &&
+      s.wax.every((n: unknown) => typeof n === 'number' && Number.isFinite(n) && n >= 0 && n <= 1)
+    ) {
+      const { wax: legacyWax, ...prior } = s;
+      s = { ...prior, version: 2, waxWork: 0, workbench: null };
+      migrated = legacyWax.some((n: number) => n > 0);
+    }
     if (!validate(s)) throw Error('Invalid save');
     s.customers = [];
     s.arrival = 2;
     s.serial = 1;
-    return { state: s, recovered: false };
+    return { state: s, recovered: false, migrated };
   } catch {
     return { state: fresh(), recovered: true };
   }

@@ -18,33 +18,18 @@ async (page) => {
   }
   async function crush() {
     let s = await snap();
-    if (s.mode !== 'bench') {
-      await move(-3.7, -1.4);
-      await page.keyboard.press('e');
-    } else if (s.done) {
-      await page.getByRole('button', { name: '다음 말랑이 →' }).click();
+    if(s.mode !== 'bench'){ await move(-3.7,-1.4); await page.keyboard.press('e'); }
+    else if(s.done) await page.getByRole('button',{name:'다음 →',exact:true}).click();
+    await page.waitForFunction(()=>window.__wakppu.waxStats().ready);
+    await page.getByRole('button',{name:'누르기',exact:true}).click();
+    for(let i=0;i<40;i++){
+      if((await snap()).done)return;
+      const p=(await page.evaluate(()=>window.__wakppu.waxTargets()))[0];
+      if(p){await page.mouse.move(p.x,p.y);await page.mouse.down();await page.waitForTimeout(1200);await page.mouse.up();}
+      await page.waitForTimeout(800);
+      if(i%4===3||!p){const {width,height}=page.viewportSize();await page.mouse.move(width/2,height/2);await page.mouse.down({button:'right'});await page.mouse.move(width/2+170,height/2+60,{steps:6});await page.mouse.up({button:'right'});}
     }
-    await page.waitForTimeout(400);
-    for (let rot = 0; rot < 12; rot++) {
-      if ((await snap()).done) return;
-      const p = await page.evaluate(() => window.__wakppu.project(-3.7, 1.9, -2.9));
-      const r = (page.viewportSize().height / 5.6) * 0.55;
-      for (const [dx, dy] of [
-        [0, 0],
-        [-0.8, -0.55],
-        [0.8, -0.55],
-        [0.8, 0.55],
-        [-0.8, 0.55],
-      ]) {
-        await page.mouse.move(p.x + dx * r, p.y + dy * r);
-        await page.mouse.down();
-        await page.waitForTimeout(290);
-        await page.mouse.up();
-      }
-      await page.waitForTimeout(750);
-      if (!(await snap()).done) await page.getByRole('button', { name: '↻ 돌리기' }).click();
-    }
-    if (!(await snap()).done) throw Error('Crush incomplete');
+    if(!(await snap()).done)throw Error('Crush incomplete');
   }
   async function purchase(key) {
     await page.getByRole('button', { name: '가게 성장' }).click();
@@ -103,3 +88,5 @@ async (page) => {
   }
   return report;
 }
+
+

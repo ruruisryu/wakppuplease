@@ -14,7 +14,7 @@ async function boot() {
   const game = new Game(loaded.state);
   const world = new World($<HTMLCanvasElement>('world'));
   const audio = new Audio();
-  const wax = new Wax(world.scene, game, audio);
+  const wax = new Wax(world.renderer, game, audio);
   const menu = $<HTMLDialogElement>('menu');
   let menuType = '';
   let toastTimer = 0;
@@ -30,6 +30,7 @@ async function boot() {
     toastTimer = 3;
   };
   const persist = () => {
+    wax.capture();
     if (!save(game.s)) toast('저장 공간을 사용할 수 없어요. 이번 플레이는 계속할 수 있어요.');
   };
   const enter = () => {
@@ -40,7 +41,7 @@ async function boot() {
       return;
     }
     input.clear();
-    wax.enter();
+    void wax.enter();
   };
   const leave = () => {
     wax.leave();
@@ -57,6 +58,7 @@ async function boot() {
     input.clear();
     wax.down = false;
     wax.pointerId = -1;
+    audio.crack.stopAll();
     menuType = type;
     $('menuContent').innerHTML = type === 'growth' ? growth(game) : settings(game);
     if (!menu.open) menu.showModal();
@@ -115,6 +117,15 @@ async function boot() {
         if (menu.open) close();
         else if (wax.active) leave();
         else open('pause');
+      } else if (!menu.open && wax.active) {
+        if (key === 'Space') wax.pressCenter();
+        const directions: Record<string, [number, number]> = {
+          ArrowLeft: [-0.15, 0],
+          ArrowRight: [0.15, 0],
+          ArrowUp: [0, -0.12],
+          ArrowDown: [0, 0.12],
+        };
+        if (directions[key]) wax.rotate(...directions[key]);
       } else if (key === 'KeyE') enter();
     },
     () => menu.open || wax.active,
@@ -125,24 +136,39 @@ async function boot() {
   $('closeMenu').onclick = close;
   $('interact').onclick = enter;
   $('back').onclick = leave;
-  $('rotate').onclick = () => {
-    wax.down = false;
-    wax.rotation += Math.PI / 2;
+  $('press').onclick = () => wax.setMode('press');
+  $('rotate').onclick = () => wax.setMode('rotate');
+  $('sweep').onclick = () => wax.setMode('sweep');
+  $('clear').onclick = () => {
+    wax.clear();
+    persist();
+  };
+  $('retryWax').onclick = () => {
+    void wax.enter();
+  };
+  $<HTMLSelectElement>('model').onchange = async (e) => {
+    await wax.changeModel((e.target as HTMLSelectElement).value as typeof wax.model);
+    persist();
   };
   $('coating').onclick = () => {
-    wax.hard = !wax.hard;
-    $('coating').textContent = wax.hard ? '단단한 껍질' : '얇은 껍질';
+    const choices = ['classic', 'soft', 'hard'] as const;
+    wax.coating = choices[(choices.indexOf(wax.coating) + 1) % 3];
+    wax.down = false;
+    wax.configure();
+    persist();
   };
   $('tool').onclick = () => {
     wax.wide = !wax.wide;
-    $('tool').textContent = wax.wide ? '넓은 누르개' : '손끝';
+    wax.down = false;
+    wax.configure();
+    persist();
   };
   $('next').onclick = () => {
     if (game.s.tray >= B.trayCapacity) {
       toast('트레이가 가득 찼어요. 매장으로 돌아가 주세요');
       return;
     }
-    wax.enter();
+    void wax.enter();
   };
   menu.addEventListener('cancel', (e) => {
     e.preventDefault();
@@ -154,11 +180,11 @@ async function boot() {
     if (!wax.active || menu.open || wax.pointerId !== -1) return;
     canvas.setPointerCapture(e.pointerId);
     wax.pointerId = e.pointerId;
-    wax.down = true;
-    wax.aim(e.clientX, e.clientY, world.camera);
+    canvas.focus({ preventScroll: true });
+    wax.begin(e);
   });
   canvas.addEventListener('pointermove', (e) => {
-    if (e.pointerId === wax.pointerId) wax.aim(e.clientX, e.clientY, world.camera);
+    if (e.pointerId === wax.pointerId && !menu.open) wax.aim(e.clientX, e.clientY);
   });
   const release = (e: PointerEvent) => {
     if (e.pointerId === wax.pointerId) {
@@ -170,6 +196,9 @@ async function boot() {
   canvas.addEventListener('pointerup', release);
   canvas.addEventListener('pointercancel', release);
   canvas.addEventListener('lostpointercapture', release);
+  addEventListener('keyup', (e) => {
+    if (e.code === 'Space') wax.down = false;
+  });
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
   addEventListener('resize', () => world.resize());
   addEventListener('blur', () => {
@@ -197,6 +226,7 @@ async function boot() {
   canvas.addEventListener('webglcontextrestored', () => location.reload());
   quality();
   if (loaded.recovered) toast('저장 데이터를 읽지 못해 새 공방으로 복구했어요');
+  if (loaded.migrated) toast('새 파쇄 작업대를 준비했어요. 코인과 가게 성장은 이어집니다.');
   $('loading').remove();
   // Read-only browser QA surface; no economy, movement or reward mutation shortcuts.
   Object.defineProperty(window, '__wakppu', {
@@ -205,6 +235,13 @@ async function boot() {
         JSON.parse(
           JSON.stringify({
             ...game.s,
+            workbench: game.s.workbench
+              ? {
+                  engine: game.s.workbench.engine,
+                  model: game.s.workbench.model,
+                  plates: game.s.workbench.plates.length,
+                }
+              : null,
             mode: wax.active ? 'bench' : 'shop',
             paused: menu.open,
             progress: wax.progress(),
@@ -213,6 +250,8 @@ async function boot() {
           }),
         ),
       project: (x: number, y: number, z: number) => world.screen(x, y, z),
+      waxTargets: () => wax.targets(),
+      waxStats: () => wax.stats(),
     },
   });
   function frame(now: number) {
@@ -261,11 +300,34 @@ async function boot() {
     audio.muted = game.s.settings.muted;
     audio.volume = game.s.settings.volume;
     world.update(game, menu.open ? 0 : dt, wax.active);
-    world.render();
+    if (wax.active && wax.ready) wax.render(world.renderer);
+    else world.render();
     hudTime += dt;
     if (hudTime > 0.08) {
       updateHUD(game, wax.active, wax.done);
       $('bar').style.width = `${wax.progress()}%`;
+      if (wax.active) {
+        $('benchHint').textContent =
+          wax.error ||
+          (!wax.ready
+            ? '말랑이를 준비하고 있어요…'
+            : wax.done
+              ? '개봉 완료! 트레이에 말랑이 1개를 놓았어요.'
+              : wax.mode === 'rotate'
+                ? '드래그해서 돌리기 · 방향키로도 돌릴 수 있어요'
+                : wax.mode === 'sweep'
+                  ? '금 간 작은 조각과 바닥 파편을 쓸어 주세요'
+                  : '누르고 문질러 주세요 · 오른쪽 드래그로 돌리기');
+        $('retryWax').hidden = !wax.error;
+        $<HTMLSelectElement>('model').value = wax.model;
+        $<HTMLSelectElement>('model').disabled = !wax.ready || (game.s.waxWork > 0 && !wax.done);
+        $('coating').textContent = { classic: '기본 코팅', soft: '얇은 코팅', hard: '단단한 코팅' }[
+          wax.coating
+        ];
+        $('tool').textContent = wax.wide ? '넓은 누르개' : '손끝';
+        for (const id of ['press', 'rotate', 'sweep'])
+          $('' + id).setAttribute('aria-pressed', String(wax.mode === id));
+      }
       hudTime = 0;
     }
     if (toastTimer > 0) {

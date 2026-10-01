@@ -224,9 +224,63 @@ button:focus-visible {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  flex-direction: column;
+  align-items: center;
   gap: 10px;
   pointer-events: auto;
   white-space: nowrap;
+}
+.bench-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.bench-tools select {
+  font: inherit;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid white;
+  border-radius: 16px;
+  padding: 10px;
+  min-height: 46px;
+  max-width: 125px;
+}
+.bench-tools button[aria-pressed='true'] {
+  background: var(--green);
+  color: white;
+}
+#benchHint {
+  bottom: 155px;
+  padding: 0 14px;
+}
+#world:focus {
+  outline: none;
+}
+@media (max-width: 650px) {
+  .bench-row {
+    gap: 5px;
+  }
+  .bench-tools select {
+    max-width: 98px;
+    font-size: 14px;
+    padding: 8px;
+  }
+  #benchHint {
+    bottom: 145px;
+  }
+}
+@media (max-height: 500px) {
+  #benchHint {
+    bottom: 119px;
+    font-size: 13px;
+  }
+  .bench-tools button {
+    min-height: 38px;
+    padding: 7px 12px;
+  }
+  .bench-tools select {
+    min-height: 38px;
+  }
 }
 #next {
   background: #347e6f;
@@ -477,5 +531,16 @@ input[type='range'] {
   * {
     transition: none !important;
     animation-duration: 0.01s !important;
+  }
+}
+/* Two tool rows need their own safe space on compact displays. */
+@media (max-width: 650px) {
+  #benchHint {
+    bottom: 145px;
+  }
+}
+@media (max-height: 500px) {
+  #benchHint {
+    bottom: 119px;
   }
 }

@@ -1,4 +1,5 @@
 import balance from './balance.json' with { type: 'json' };
+import type { WorkbenchSave } from './wax-state.ts';
 export const B = balance;
 export type Upgrade = keyof typeof B.upgrades;
 export type Person = { x: number; z: number; heading: number; walk: number };
@@ -10,7 +11,7 @@ export type Customer = Person & {
   paid: boolean;
 };
 export type State = {
-  version: 1;
+  version: 2;
   coins: number;
   sold: number;
   made: number;
@@ -19,7 +20,8 @@ export type State = {
   carried: number;
   player: Person;
   upgrades: Record<Upgrade, boolean>;
-  wax: number[];
+  waxWork: number;
+  workbench: WorkbenchSave | null;
   batch: number;
   customers: Customer[];
   arrival: number;
@@ -41,7 +43,7 @@ export const obstacles = [
   { x: 4, z: -2.9, w: 2.7, d: 1.5 },
 ];
 export const fresh = (): State => ({
-  version: 1,
+  version: 2,
   coins: 0,
   sold: 0,
   made: 0,
@@ -50,7 +52,8 @@ export const fresh = (): State => ({
   carried: 0,
   player: { x: -3.7, z: 0, heading: 0, walk: 0 },
   upgrades: { carry: false, runner: false, runnerCarry: false, expansion: false },
-  wax: Array(80).fill(0),
+  waxWork: 0,
+  workbench: null,
   batch: 1,
   customers: [],
   arrival: 2,
@@ -101,12 +104,12 @@ export class Game {
   }
   complete(batch: number) {
     const s = this.s;
-    if (batch !== s.batch || s.tray >= B.trayCapacity || s.wax.filter((x) => x >= 1).length < 64)
-      return false;
+    if (batch !== s.batch || s.tray >= B.trayCapacity || s.waxWork < 0.6) return false;
     s.tray++;
     s.made++;
     s.batch++;
-    s.wax.fill(0);
+    s.waxWork = 0;
+    s.workbench = null;
     this.events.push({ type: 'made', ...spots.tray });
     return true;
   }

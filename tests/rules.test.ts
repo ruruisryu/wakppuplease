@@ -4,7 +4,7 @@ import { Game, fresh, B } from '../src/game/simulation.ts';
 import { validate } from '../src/game/save.ts';
 test('completion is once per batch and never directly gives coins', () => {
   const g = new Game();
-  g.s.wax.fill(1);
+  g.s.waxWork = 1;
   assert.ok(g.complete(1));
   assert.equal(g.s.tray, 1);
   assert.equal(g.s.coins, 0);
@@ -14,7 +14,7 @@ test('completion is once per batch and never directly gives coins', () => {
 test('full output blocks completion without losing work', () => {
   const g = new Game();
   g.s.tray = 8;
-  g.s.wax.fill(1);
+  g.s.waxWork = 1;
   assert.equal(g.complete(1), false);
   assert.equal(g.s.batch, 1);
   g.s.tray--;
@@ -82,9 +82,9 @@ test('movement collides with furniture and room edges', () => {
 });
 test('save validation rejects damaged and unsupported saves', () => {
   assert.ok(validate(fresh()));
-  assert.equal(validate({ ...fresh(), version: 2 }), false);
+  assert.equal(validate({ ...fresh(), version: 3 }), false);
   assert.equal(validate({ ...fresh(), coins: -1 }), false);
-  assert.equal(validate({ ...fresh(), wax: [1] }), false);
+  assert.equal(validate({ ...fresh(), waxWork: Number.NaN }), false);
   assert.equal(validate({ ...fresh(), runner: null }), false);
   assert.equal(validate({ ...fresh(), settings: { muted: false } }), false);
 });

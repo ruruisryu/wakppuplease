@@ -27,3 +27,4 @@ async (page) => {
   await page.screenshot({ path: 'output/playwright/05-first-sale.png' });
   return { carried, sold: s.sold, coins: s.coins, shelf: s.shelf, player: s.player };
 }
+

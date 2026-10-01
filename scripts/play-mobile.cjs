@@ -21,8 +21,8 @@ async (page) => {
   await send('touchEnd', []);
   const moved = (await snap()).player.z;
   await tap(page.getByRole('button', { name: 'E · 개봉하기' }));
-  await page.waitForTimeout(700);
-  const p = await page.evaluate(() => window.__wakppu.project(-3.7, 1.9, -2.9));
+  await page.waitForFunction(() => window.__wakppu.waxStats().ready);
+  const p = (await page.evaluate(() => window.__wakppu.waxTargets()))[0];
   await send('touchStart', [[p.x, p.y]]);
   await page.waitForTimeout(550);
   await send('touchMove', [[p.x + 28, p.y + 18]]);
@@ -33,9 +33,9 @@ async (page) => {
   // A canceled touch must never remain pressed.
   await send('touchStart', [[p.x - 30, p.y]]);
   await send('touchCancel', []);
-  const before = (await snap()).wax;
+  const before = (await snap()).waxWork;
   await page.waitForTimeout(600);
-  const after = (await snap()).wax;
+  const after = (await snap()).waxWork;
   await tap(page.getByRole('button', { name: '← 매장' }));
   await tap(page.getByRole('button', { name: '일시정지' }));
   const pausedBefore = (await snap()).player;
@@ -64,7 +64,7 @@ async (page) => {
     touchCancelStopped: JSON.stringify(before) === JSON.stringify(after),
     pausedInputBlocked: JSON.stringify(pausedBefore) === JSON.stringify(pausedAfter),
     mutedRestored: restored.settings.muted,
-    waxRestored: restored.wax.some((v) => v > 0),
+    waxRestored: restored.waxWork > 0,
     scroll: await page.evaluate(() => ({
       w: innerWidth,
       h: innerHeight,
@@ -73,3 +73,5 @@ async (page) => {
     })),
   };
 }
+
+

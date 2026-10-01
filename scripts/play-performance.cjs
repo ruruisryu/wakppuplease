@@ -8,3 +8,4 @@ async page => {
  await page.screenshot({path:'output/playwright/06-expanded.png'});
  return {viewport:page.viewportSize(),high,low,metrics:(await snap()).metrics};
 }
+

@@ -8,3 +8,4 @@ async page => {
  await page.getByRole('button',{name:'일시정지'}).click();
  return report;
 }
+

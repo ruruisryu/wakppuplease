@@ -11,7 +11,12 @@ export class Input {
     private blocked: () => boolean,
   ) {
     addEventListener('keydown', (e) => {
-      if (e.target instanceof HTMLInputElement) return;
+      if (
+        (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) &&
+        e.code !== 'Escape'
+      )
+        return;
+      if (e.target instanceof HTMLButtonElement && ['Space', 'Enter'].includes(e.code)) return;
       if (['Escape', 'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code))
         e.preventDefault();
       this.audio.unlock();

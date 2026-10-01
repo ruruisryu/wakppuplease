@@ -9,3 +9,4 @@ async page => {
  const cleanFailures=[...failed];await page.route('**/assets/*.js',route=>route.abort());await page.reload();await page.waitForTimeout(400);const fallback=await page.getByRole('button',{name:'다시 열기'}).isVisible();await page.unroute('**/assets/*.js');await page.reload();await page.waitForTimeout(500);
  return {mode,paused,errors,networkFailures:cleanFailures,loadFailureFallback:fallback,recovered:await page.evaluate(()=>!!window.__wakppu)};
 }
+

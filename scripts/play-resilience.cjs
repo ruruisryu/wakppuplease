@@ -5,7 +5,7 @@ async (page) => {
   await page.getByRole('button', { name: '새 공방 시작하기' }).click();
   await page.getByRole('button', { name: '초기화하고 시작' }).click();
   let s = await snap();
-  report.reset = s.made === 0 && s.coins === 0 && s.wax.every((x) => x === 0);
+  report.reset = s.made === 0 && s.coins === 0 && s.waxWork === 0 && s.workbench === null;
   await page.keyboard.down('w');
   await page.waitForTimeout(1000);
   await page.keyboard.up('w');
@@ -55,3 +55,5 @@ async (page) => {
   report.resources = resources;
   return report;
 }
+
+
