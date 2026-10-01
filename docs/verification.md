@@ -1,6 +1,6 @@
 # 실제 검증 기록
 
-2026-10-01 · 로컬 구현 완료, 공개 배포 대기.
+2026-10-01 · 로컬 구현·GitHub Pages 배포·공개 플레이 검증 완료.
 
 ## 실행한 검사
 
@@ -37,6 +37,12 @@ Headless Chromium, 1280×900, 확장 후 매장: 고품질 1초 표본 22/22/21f
 
 ## GitHub Pages 상태
 
-처음 폴더에 Git 원격·Pages 설정이 없었다. 사용자가 새 이름 `wakppuplease`를 지정해 공개 저장소 `ruruisryu/wakppuplease`를 생성했다. CLI 자체 로그인은 없었지만 기존 Git Credential Manager의 선택 계정 인증을 메모리에서만 사용하여 배포 권한을 확인했다. 현재 공개 배포·워크플로 성공·공개 URL 플레이 검증은 진행 중이다. 다른 호스팅으로 대체하지 않았다.
+처음 폴더에 Git 원격·Pages 설정이 없었다. 사용자가 새 이름 `wakppuplease`를 지정해 공개 저장소 `ruruisryu/wakppuplease`를 생성했다. CLI 자체 로그인은 없었지만 기존 Git Credential Manager의 선택 계정 인증을 메모리에서만 사용하여 배포했다. 기존 사이트를 덮어쓰지 않았으며 다른 호스팅으로 대체하지 않았다.
 
-공개 주소와 최종 워크플로·플레이 결과는 배포 후 이 문서에 기록한다.
+- 공개 URL: **https://ruruisryu.github.io/wakppuplease/** — HTTPS 적용.
+- [배포 워크플로 36863732708](https://github.com/ruruisryu/wakppuplease/actions/runs/36863732708): completed / success. 실행 코드 커밋 `0ac1d5b2fd5037da4d9b6aad7d380fd72c172463`.
+- 실제 공개 URL에서 첫 로딩 → WASD 이동 → E 작업대 → 마우스 파쇄 완료 → 운반 → 고객 결제까지 연결. 완료 직후 `made=1, tray=1, coins=0`, 판매 후 `sold=1, coins=10`.
+- 사용자 입력 후 실제 AudioContext 상태 `running`. 음소거 선택 후 새로고침에서도 유지. 음원은 외부 파일이 아닌 Web Audio 합성이다.
+- 공개 JS/CSS/한국어 폰트 모두 200. 정상 흐름의 콘솔 오류 0, 실패 요청 0. 새로고침 후 `sold=1, coins=10`과 음소거 상태 일치.
+- [공개 첫 화면](evidence/public-first.png), [공개 판매·저장 복원 화면](evidence/public-sale.png).
+- 이후 문서만 수정한 커밋은 배포 제외 규칙을 사용한다. 실행 코드·에셋 변경은 항상 다시 빌드·배포한다.

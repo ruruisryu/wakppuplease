@@ -2,6 +2,10 @@
 
 매장을 걸어 다니며 왁스 껍질을 열고, 말랑이를 운반해 손님에게 건네는 3D 브라우저 게임.
 
+**[바로 플레이 — GitHub Pages](https://ruruisryu.github.io/wakppuplease/)**
+
+공개 사이트에서 실제 이동·파쇄·운반·판매·저장 복원을 검증했습니다.
+
 ```powershell
 npm ci
 npm run dev

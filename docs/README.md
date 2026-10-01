@@ -4,6 +4,8 @@ status: implementation
 updated: 2026-10-01
 summary: 선행 기획 A안을 바탕으로 Three.js 웹게임을 구현했다. 실제 적용 규칙과 검증은 아래 구현 문서를 따른다.
 
+- [공개 게임](https://ruruisryu.github.io/wakppuplease/): GitHub Pages 배포 및 실제 공개 플레이 확인 완료.
+
 - [구현 결정](implementation.md): 실행 코드에 적용한 규칙·아트·입력·저장·Unity 이식 경계.
 - [검증 결과](verification.md): 로컬과 공개 배포 검증 결과 및 한계.
 
