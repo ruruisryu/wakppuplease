@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#377f73">
+  <title>왁뿌! 말랑 공방</title>
+</head>
+<body>
+  <div id="loading">왁뿌!<small>말랑한 하루를 준비하고 있어요…</small></div>
+  <div id="app"></div>
+  <script>
+    function loadFailed() {
+      const loading = document.getElementById('loading');
+      if (loading) loading.innerHTML = '공방 파일을 불러오지 못했어요.<br>연결을 확인한 뒤 <button onclick="location.reload()">다시 열기</button>';
+    }
+    setTimeout(loadFailed, 20000);
+    window.addEventListener('error', function (event) {
+      if (event.target && event.target.tagName === 'SCRIPT') loadFailed();
+    }, true);
+  </script>
+  <script type="module" src="/src/main.ts" onerror="loadFailed()"></script>
+</body>
+</html>

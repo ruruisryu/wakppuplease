@@ -1,0 +1,481 @@
+@import '@fontsource/jua/korean-400.css';
+:root {
+  font-family: Jua, 'Arial Rounded MT Bold', sans-serif;
+  color: #294f48;
+  background: #aed4c4;
+  --ink: #294f48;
+  --paper: #fff8e6;
+  --green: #347e6f;
+}
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+  touch-action: none;
+  overscroll-behavior: none;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  border: 2px solid #fff9e9;
+  border-radius: 18px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 4px 0 #40766b33;
+  padding: 12px 18px;
+  min-height: 46px;
+  touch-action: manipulation;
+}
+button:hover {
+  filter: brightness(1.04);
+}
+button:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+button:focus-visible {
+  outline: 4px solid #e4b750;
+  outline-offset: 3px;
+}
+[hidden] {
+  display: none !important;
+}
+#world {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100dvh;
+  touch-action: none;
+}
+#loading {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  font-size: 48px;
+  background: #aed4c4;
+  z-index: 20;
+}
+#loading small {
+  font-size: 18px;
+  margin-top: 20px;
+}
+#hud {
+  position: fixed;
+  top: max(20px, env(safe-area-inset-top));
+  left: 24px;
+  right: 24px;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.wallet {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--paper);
+  border: 3px solid white;
+  border-radius: 22px;
+  padding: 8px 17px 8px 8px;
+  box-shadow: 0 5px 0 #39766524;
+}
+.wallet b {
+  font-size: 29px;
+  min-width: 35px;
+}
+.coin {
+  display: grid;
+  place-content: center;
+  border: 3px solid #dea636;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  background: #f6d66e;
+  color: #a7771c;
+  font-size: 20px;
+}
+#carry {
+  border-left: 2px solid #d8dcca;
+  padding-left: 12px;
+  font-size: 16px;
+}
+#objective {
+  background: #fdf8e3de;
+  border-radius: 15px;
+  padding: 12px 17px;
+  font-size: 17px;
+  margin-top: 4px;
+}
+.top-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+}
+.top-actions button {
+  font-size: 18px;
+}
+#pause {
+  width: 49px;
+  padding: 10px;
+}
+#controls {
+  position: fixed;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  white-space: nowrap;
+}
+#keyboardHint {
+  font-size: 14px;
+  color: #466e61;
+  background: #fff8e6c9;
+  padding: 10px 16px;
+  border-radius: 18px;
+}
+#interact {
+  background: #327e6c;
+  color: white;
+  font-size: 19px;
+  border-color: #93cbb2;
+}
+#toast {
+  position: fixed;
+  left: 50%;
+  top: 105px;
+  transform: translateX(-50%);
+  border-radius: 20px;
+  background: #fff8df;
+  padding: 12px 22px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+  font-size: 21px;
+  z-index: 4;
+}
+#toast.show {
+  opacity: 1;
+}
+#benchHUD {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+.bench-title {
+  position: absolute;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 29px;
+  color: #2d6658;
+  text-shadow: 0 2px #fff7de;
+}
+.progress {
+  position: absolute;
+  top: 143px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 12px;
+  background: #fff3d1;
+  border-radius: 10px;
+  overflow: hidden;
+}
+#bar {
+  display: block;
+  height: 100%;
+  background: #daaa47;
+  width: 0;
+  transition: width 0.1s;
+}
+#benchHint {
+  position: absolute;
+  bottom: 98px;
+  width: 100%;
+  text-align: center;
+  font-size: 17px;
+  color: #305b50;
+}
+#back {
+  position: absolute;
+  left: 24px;
+  top: 100px;
+  pointer-events: auto;
+}
+.bench-tools {
+  position: absolute;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+#next {
+  background: #347e6f;
+  color: white;
+}
+#joystick {
+  position: fixed;
+  bottom: max(28px, env(safe-area-inset-bottom));
+  left: 28px;
+  width: 112px;
+  height: 112px;
+  border: 3px solid #fff9e8aa;
+  background: #56877433;
+  border-radius: 50%;
+  display: none;
+  touch-action: none;
+}
+#knob {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #fff5dbd9;
+  border: 3px solid white;
+  position: absolute;
+  top: 27px;
+  left: 27px;
+  pointer-events: none;
+}
+dialog {
+  border: 4px solid #fffdf0;
+  border-radius: 30px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 0 16px 70px #163c4555;
+  padding: 28px;
+  width: min(470px, calc(100% - 28px));
+  max-height: 90dvh;
+  overflow: auto;
+  touch-action: pan-y;
+}
+dialog::backdrop {
+  background: #174c4866;
+  backdrop-filter: blur(5px);
+}
+h1 {
+  font-size: 27px;
+  margin: 0 0 12px;
+}
+p {
+  line-height: 1.55;
+  margin: 10px 0 20px;
+}
+.upgrade-list {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+}
+.upgrade-list button {
+  display: flex;
+  text-align: left;
+  justify-content: space-between;
+  gap: 12px;
+  background: #e3efe1;
+  border-color: #c4d8bb;
+}
+.upgrade-list small {
+  display: block;
+  font-size: 13px;
+  margin-top: 6px;
+}
+.upgrade-list b {
+  font-size: 19px;
+}
+.upgrade-list strong {
+  align-self: center;
+  white-space: nowrap;
+  color: #926e24;
+}
+#closeMenu {
+  display: block;
+  width: 100%;
+  background: #377e6d;
+  color: white;
+  margin-top: 18px;
+}
+label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  font-size: 18px;
+}
+input[type='checkbox'] {
+  width: 24px;
+  height: 24px;
+  accent-color: #347e6f;
+}
+input[type='range'] {
+  width: 135px;
+  accent-color: #347e6f;
+}
+.help {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #648076;
+}
+.danger {
+  color: #a45456;
+  font-size: 15px;
+}
+.floating {
+  position: fixed;
+  pointer-events: none;
+  font-size: 28px;
+  color: #fff8d9;
+  text-shadow: 0 2px #7d7041;
+  animation: fly 1.2s ease-out forwards;
+  z-index: 3;
+}
+@keyframes fly {
+  to {
+    transform: translateY(-65px);
+    opacity: 0;
+  }
+}
+@media (pointer: coarse) {
+  #joystick {
+    display: block;
+  }
+  #keyboardHint {
+    display: none;
+  }
+  #controls {
+    left: auto;
+    right: 24px;
+    transform: none;
+    bottom: 50px;
+  }
+}
+@media (max-width: 650px) {
+  #hud {
+    top: max(12px, env(safe-area-inset-top));
+    left: 12px;
+    right: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .wallet {
+    padding: 6px 12px 6px 6px;
+    gap: 8px;
+  }
+  .wallet b {
+    font-size: 24px;
+  }
+  #objective {
+    order: 3;
+    flex-basis: 100%;
+    width: fit-content;
+    flex-grow: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+    margin: 0;
+    background: #fdf8e3cc;
+  }
+  .top-actions button {
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+  .bench-title {
+    top: 133px;
+    font-size: 24px;
+  }
+  .progress {
+    top: 169px;
+    width: 160px;
+  }
+  #back {
+    top: 130px;
+    left: 12px;
+    padding: 10px;
+  }
+  #benchHint {
+    font-size: 14px;
+    bottom: 94px;
+  }
+  .bench-tools {
+    gap: 6px;
+    bottom: 22px;
+  }
+  .bench-tools button {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+  #toast {
+    top: 190px;
+    font-size: 18px;
+    width: max-content;
+    max-width: 90%;
+    text-align: center;
+  }
+  #keyboardHint {
+    display: none;
+  }
+  #controls {
+    bottom: 35px;
+  }
+  #joystick {
+    width: 102px;
+    height: 102px;
+    left: 20px;
+  }
+  #knob {
+    top: 22px;
+    left: 22px;
+  }
+}
+@media (max-height: 500px) {
+  #objective {
+    font-size: 13px;
+  }
+  .bench-title {
+    top: 70px;
+    font-size: 20px;
+  }
+  .progress {
+    top: 101px;
+  }
+  #back {
+    top: 75px;
+  }
+  #benchHint {
+    bottom: 70px;
+  }
+  .bench-tools {
+    bottom: 12px;
+  }
+  #joystick {
+    width: 90px;
+    height: 90px;
+    bottom: 16px;
+  }
+  #knob {
+    top: 16px;
+    left: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation-duration: 0.01s !important;
+  }
+}

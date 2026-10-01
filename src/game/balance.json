@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "speed": 3.8,
+  "carry": 2,
+  "trayCapacity": 8,
+  "shelfCapacity": 6,
+  "arrivalSeconds": 12,
+  "patienceSeconds": 120,
+  "serviceSeconds": 1.4,
+  "netPrice": 10,
+  "workerSeconds": 12,
+  "upgrades": { "carry": 30, "runner": 60, "runnerCarry": 60, "expansion": 90 }
+}
